@@ -1,0 +1,59 @@
+name: Android APK Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 35
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          yes | sdkmanager --licenses
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        working-directory: AtomStreamTV-Project
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Verify APK exists
+        working-directory: AtomStreamTV-Project
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          if [ ! -s "$APK" ]; then
+            echo "::error::APK was not generated at $APK"
+            exit 1
+          fi
+          echo "APK generated successfully:"
+          ls -lh "$APK"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AtomStreamTV-APK
+          path: AtomStreamTV-Project/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
