@@ -125,7 +125,6 @@ class PlayerActivity : AppCompatActivity() {
             (webView.parent as? ViewGroup)?.removeView(webView)
             webView.stopLoading()
             webView.webChromeClient = null
-            webView.webViewClient = null
             webView.destroy()
         }
         super.onDestroy()
