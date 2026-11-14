@@ -31,9 +31,11 @@ object WebViewManager {
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
             cacheMode = WebSettings.LOAD_DEFAULT
             userAgentString = userAgentString
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                safeBrowsingEnabled = true
+            }
         }
         CookieManagerCompat.enableThirdPartyCookies(webView)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WebView.setSafeBrowsingEnabled(true)
         webView.webChromeClient = chromeClient
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
